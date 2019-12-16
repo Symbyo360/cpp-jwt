@@ -77,12 +77,14 @@ SOFTWARE.
 #endif
 
 // allow for portable deprecation warnings
+#ifndef JSON_DEPRECATED
 #if defined(__clang__) || defined(__GNUC__) || defined(__GNUG__)
     #define JSON_DEPRECATED __attribute__((deprecated))
 #elif defined(_MSC_VER)
     #define JSON_DEPRECATED __declspec(deprecated)
 #else
     #define JSON_DEPRECATED
+#endif
 #endif
 
 // allow to disable exceptions
