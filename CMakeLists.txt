@@ -12,6 +12,7 @@ project(cpp-jwt VERSION 1.5.0)
 option(CPP_JWT_BUILD_EXAMPLES "build examples" ${root_project})
 option(CPP_JWT_BUILD_TESTS "build tests" ${root_project})
 option(CPP_JWT_USE_VENDORED_NLOHMANN_JSON "use vendored json header" ON)
+option(CPP_JWT_USE_INTERNAL_SSL "use internal ssl" ON)
 option(CPP_JWT_INSTALL "generate install targets" ${root_project})
 
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_BINARY_DIR})
@@ -32,7 +33,9 @@ if(root_project)
   endif()
 endif()
 
-find_package(OpenSSL REQUIRED SSL)
+if(NOT CPP_JWT_USE_INTERNAL_SSL)
+  find_package(OpenSSL REQUIRED SSL)
+endif()
 
 if(NOT CPP_JWT_USE_VENDORED_NLOHMANN_JSON)
   find_package(nlohmann_json REQUIRED)
@@ -47,7 +50,13 @@ target_include_directories(
   ${PROJECT_NAME}
   INTERFACE $<BUILD_INTERFACE:${${PROJECT_NAME}_SOURCE_DIR}/include>
             $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
-target_link_libraries(${PROJECT_NAME} INTERFACE OpenSSL::SSL)
+
+if(NOT CPP_JWT_USE_INTERNAL_SSL)
+  target_link_libraries(${PROJECT_NAME} INTERFACE OpenSSL::SSL)
+else()
+  target_link_libraries(${PROJECT_NAME} INTERFACE ssl)
+endif()
+
 if(NOT CPP_JWT_USE_VENDORED_NLOHMANN_JSON)
   target_link_libraries(${PROJECT_NAME} INTERFACE nlohmann_json::nlohmann_json)
 else()
